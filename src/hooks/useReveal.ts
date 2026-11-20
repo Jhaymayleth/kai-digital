@@ -33,6 +33,28 @@ export function useReveal() {
 
     items.forEach((item) => observer.observe(item))
 
-    return () => observer.disconnect()
+    /**
+     * Al entrar directo con `#proyecto` el observer puede tardar un frame en
+     * dispararse; revelamos de inmediato lo que ya está en pantalla para que
+     * la sección nunca aparezca vacía.
+     */
+    const revealVisible = () => {
+      const viewport = window.innerHeight
+      items.forEach((item) => {
+        if (item.classList.contains('is-visible')) return
+        const rect = item.getBoundingClientRect()
+        if (rect.top < viewport * 0.92 && rect.bottom > 0) {
+          item.classList.add('is-visible')
+          observer.unobserve(item)
+        }
+      })
+    }
+
+    const frame = window.requestAnimationFrame(revealVisible)
+
+    return () => {
+      window.cancelAnimationFrame(frame)
+      observer.disconnect()
+    }
   }, [])
 }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { projects } from '../data/projects'
+import { scrollToSection } from '../lib/scroll'
 
 const homeId = 'inicio'
 const closingId = 'closing'
@@ -97,19 +98,14 @@ export function useActiveProject() {
         return
       }
 
-      document.getElementById(id)?.scrollIntoView({
-        behavior: scrollBehavior(),
-        block: 'start',
-      })
+      scrollToSection(id, scrollBehavior())
       scheduleActiveSectionUpdate()
     }
 
     const initialId = sectionIdFromHash()
     if (initialId) {
       requestAnimationFrame(() => {
-        document.getElementById(initialId)?.scrollIntoView({
-          block: 'start',
-        })
+        scrollToSection(initialId, 'auto')
       })
     }
 

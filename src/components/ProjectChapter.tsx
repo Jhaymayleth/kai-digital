@@ -1,6 +1,9 @@
 import inkStroke from '../assets/visual/ink/sumi-ink-stroke.webp'
+import inkStroke640 from '../assets/visual/ink/sumi-ink-stroke-640.webp'
+import inkStroke960 from '../assets/visual/ink/sumi-ink-stroke-960.webp'
 import type { Dictionary } from '../i18n/dictionary'
 import type { Locale, Project } from '../types/content'
+import { TechnologyMark } from './TechnologyMark'
 
 interface ProjectChapterProps {
   project: Project
@@ -40,8 +43,13 @@ export function ProjectChapter({
           <img
             className="project-visual__ink"
             src={inkStroke}
+            srcSet={`${inkStroke640} 640w, ${inkStroke960} 960w, ${inkStroke} 1200w`}
+            sizes="(max-width: 760px) 88vw, 560px"
             alt=""
+            width={1200}
+            height={400}
             loading="lazy"
+            decoding="async"
           />
           <span className="project-visual__number">{number}</span>
           <span className="project-visual__name">{project.name}</span>
@@ -78,7 +86,10 @@ export function ProjectChapter({
           <p className="eyebrow">{t.projects.stack}</p>
           <ul className="stack-list">
             {project.stack.map((technology) => (
-              <li key={technology}>{technology}</li>
+              <li key={technology}>
+                <TechnologyMark technology={technology} />
+                <span>{technology}</span>
+              </li>
             ))}
           </ul>
         </div>

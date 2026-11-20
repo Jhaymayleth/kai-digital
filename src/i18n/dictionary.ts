@@ -12,6 +12,8 @@ export interface Dictionary {
     themeToLight: string
     themeToDark: string
     skip: string
+    openMenu: string
+    closeMenu: string
   }
   hero: {
     eyebrow: string
@@ -65,6 +67,8 @@ const es: Dictionary = {
     themeToLight: 'Cambiar a tema claro',
     themeToDark: 'Cambiar a tema oscuro',
     skip: 'Saltar al contenido',
+    openMenu: 'Abrir menú de proyectos',
+    closeMenu: 'Cerrar menú de proyectos',
   },
   hero: {
     eyebrow: 'Experiencias de proyecto',
@@ -121,6 +125,8 @@ const en: Dictionary = {
     themeToLight: 'Switch to light theme',
     themeToDark: 'Switch to dark theme',
     skip: 'Skip to content',
+    openMenu: 'Open project menu',
+    closeMenu: 'Close project menu',
   },
   hero: {
     eyebrow: 'Project experiences',

@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { ThemeContext } from './theme-context'
 import type { Theme } from './theme-context'
 
@@ -32,26 +39,36 @@ function hasStoredTheme() {
   }
 }
 
+function applyTheme(next: Theme) {
+  document.documentElement.dataset.theme = next
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', THEME_COLORS[next])
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
+  const themeRef = useRef(theme)
 
   useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    document
-      .querySelector('meta[name="theme-color"]')
-      ?.setAttribute('content', THEME_COLORS[theme])
+    themeRef.current = theme
+    applyTheme(theme)
   }, [theme])
 
+  /**
+   * El DOM se actualiza de forma síncrona para que la View Transition capture
+   * el tema nuevo en el mismo frame del clic (revelado circular).
+   */
   const toggleTheme = useCallback(() => {
-    setTheme((current) => {
-      const next = current === 'dark' ? 'light' : 'dark'
-      try {
-        window.localStorage.setItem(STORAGE_KEY, next)
-      } catch {
-        // El tema permanece disponible aunque no se pueda guardar.
-      }
-      return next
-    })
+    const next: Theme = themeRef.current === 'dark' ? 'light' : 'dark'
+    themeRef.current = next
+    applyTheme(next)
+    setTheme(next)
+    try {
+      window.localStorage.setItem(STORAGE_KEY, next)
+    } catch {
+      // El tema permanece disponible aunque no se pueda guardar.
+    }
   }, [])
 
   useEffect(() => {

@@ -1,7 +1,15 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react'
+import { Pause, Play, X } from 'lucide-react'
 import { projects } from '../data/projects'
 import { useSpeech, type AudioScene } from '../hooks/useSpeech'
 import { useLanguage } from '../i18n/useLanguage'
+import { getSectionScrollTarget } from '../lib/scroll'
 import type { Project } from '../types/content'
 import { KaiCharacter, type KaiPhase } from './KaiCharacter'
 
@@ -10,13 +18,30 @@ const sectionOrder = [
   ...projects.map((project) => project.id),
   'closing',
 ]
-const PRE_END_SCROLL_SECONDS = 2
-const SCROLL_DURATION_MS = 1800
+
+/**
+ * Ventana de transición: el scroll arranca cuando al audio le queda este
+ * tiempo y termina exactamente en `ended`. Se ajusta según la distancia.
+ */
+const MIN_TRANSITION_SECONDS = 1.6
+const MAX_TRANSITION_SECONDS = 2.8
 
 function audioSceneForSection(sectionId: string): AudioScene {
   if (sectionId === 'closing') return 'closing'
   return projects.find((project) => project.id === sectionId)?.id ?? 'welcome'
 }
+
+function transitionSecondsFor(distance: number) {
+  const seconds = MIN_TRANSITION_SECONDS + Math.abs(distance) / 2600
+  return Math.min(MAX_TRANSITION_SECONDS, Math.max(MIN_TRANSITION_SECONDS, seconds))
+}
+
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value))
+
+const easeInOutCubic = (progress: number) =>
+  progress < 0.5
+    ? 4 * progress * progress * progress
+    : 1 - Math.pow(-2 * progress + 2, 3) / 2
 
 interface KaiGuideProps {
   activeProject: Project | null
@@ -35,199 +60,199 @@ export function KaiGuide({
     audioProgress,
     speak: speakAudio,
     stop: stopAudio,
+    preload,
+    getAudio,
   } = useSpeech()
+
   const [started, setStarted] = useState(false)
   const [autoRunning, setAutoRunning] = useState(false)
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
+
   const autoRunningRef = useRef(false)
-  const audioEndedRef = useRef(false)
-  const scrollStartedRef = useRef(false)
-  const scrollFinishedRef = useRef(true)
-  const currentSceneSectionRef = useRef<string | null>(null)
+  const currentSectionRef = useRef<string | null>(null)
+  const nextSectionRef = useRef<string | null>(null)
+  const transitionStartedRef = useRef(false)
+  const monitorFrameRef = useRef<number | null>(null)
   const scrollFrameRef = useRef<number | null>(null)
-  const playSectionRef = useRef<(sectionId: string) => void>(() => {})
+  const playSceneRef = useRef<(sectionId: string) => void>(() => {})
+  const finishSceneRef = useRef<() => void>(() => {})
+
   const description = activeProject
     ? `${activeProject.name}. ${activeProject.tagline[locale]} ${t.projects.stack}: ${activeProject.stack.join(', ')}.`
     : ''
 
-  const stopCinematicScroll = useCallback(() => {
+  const cancelFrames = useCallback(() => {
+    if (monitorFrameRef.current !== null) {
+      window.cancelAnimationFrame(monitorFrameRef.current)
+      monitorFrameRef.current = null
+    }
     if (scrollFrameRef.current !== null) {
       window.cancelAnimationFrame(scrollFrameRef.current)
       scrollFrameRef.current = null
     }
+    document.documentElement.classList.remove('is-cinematic')
   }, [])
 
-  const stopAutoRun = useCallback(() => {
+  const stopRun = useCallback(() => {
     autoRunningRef.current = false
-    currentSceneSectionRef.current = null
-    stopCinematicScroll()
+    currentSectionRef.current = null
+    nextSectionRef.current = null
+    transitionStartedRef.current = false
+    cancelFrames()
     setAutoRunning(false)
-  }, [stopCinematicScroll])
+  }, [cancelFrames])
 
-  useEffect(
-    () => () => {
-      autoRunningRef.current = false
-      stopCinematicScroll()
-    },
-    [stopCinematicScroll],
-  )
+  /**
+   * Desplazamiento cinematográfico anclado al reloj del audio: en cada frame
+   * se calcula el progreso con `audio.currentTime`, así el movimiento llega
+   * al destino justo cuando la pista termina.
+   */
+  const startTransition = useCallback(() => {
+    const nextId = nextSectionRef.current
+    if (!nextId) return
+    const section = document.getElementById(nextId)
+    const audio = getAudio()
+    if (!section || !audio) return
 
-  const scrollToSection = useCallback(
-    (sectionId: string) => {
-      const section = document.getElementById(sectionId)
-      if (!section) {
-        stopAutoRun()
-        return
-      }
+    transitionStartedRef.current = true
+    const startY = window.scrollY
+    const targetY = getSectionScrollTarget(section)
+    const audioStart = audio.currentTime
+    const audioEnd =
+      Number.isFinite(audio.duration) && audio.duration > audioStart
+        ? audio.duration
+        : audioStart + MIN_TRANSITION_SECONDS
 
-      stopCinematicScroll()
-      scrollStartedRef.current = true
-      scrollFinishedRef.current = false
+    document.documentElement.classList.add('is-cinematic')
 
-      const header = document.querySelector<HTMLElement>('.site-header')
-      const headerHeight = header?.getBoundingClientRect().height ?? 0
-      const startY = window.scrollY
-      const targetY = Math.max(
-        0,
-        section.getBoundingClientRect().top + startY - headerHeight,
-      )
-
-      const finish = () => {
+    const step = () => {
+      if (!autoRunningRef.current) {
         scrollFrameRef.current = null
-        scrollFinishedRef.current = true
-        if (audioEndedRef.current && autoRunningRef.current) {
-          playSectionRef.current(sectionId)
-        }
-      }
-
-      if (
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-        Math.abs(targetY - startY) < 2
-      ) {
-        window.scrollTo({ top: targetY, behavior: 'auto' })
-        finish()
         return
       }
-
-      const startedAt = performance.now()
-      const easeInOutCubic = (progress: number) =>
-        progress < 0.5
-          ? 4 * progress * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 3) / 2
-
-      const step = (now: number) => {
-        if (!autoRunningRef.current) {
-          scrollFrameRef.current = null
-          return
-        }
-        const progress = Math.min((now - startedAt) / SCROLL_DURATION_MS, 1)
-        window.scrollTo({
-          top: startY + (targetY - startY) * easeInOutCubic(progress),
-          behavior: 'instant',
-        })
-
-        if (progress === 1) {
-          finish()
-          return
-        }
+      const player = getAudio()
+      if (!player) {
+        scrollFrameRef.current = null
+        return
+      }
+      const span = Math.max(audioEnd - audioStart, 0.001)
+      const progress = clamp01((player.currentTime - audioStart) / span)
+      window.scrollTo(
+        0,
+        startY + (targetY - startY) * easeInOutCubic(progress),
+      )
+      if (progress < 1) {
         scrollFrameRef.current = window.requestAnimationFrame(step)
+      } else {
+        scrollFrameRef.current = null
       }
+    }
 
-      scrollFrameRef.current = window.requestAnimationFrame(step)
-    },
-    [stopAutoRun, stopCinematicScroll],
-  )
+    scrollFrameRef.current = window.requestAnimationFrame(step)
+  }, [getAudio])
 
-  const playSection = useCallback(
-    (sectionId: string) => {
-      if (!autoRunningRef.current) return
+  const startMonitor = useCallback(() => {
+    if (monitorFrameRef.current !== null) {
+      window.cancelAnimationFrame(monitorFrameRef.current)
+    }
 
-      audioEndedRef.current = false
-      scrollStartedRef.current = false
-      scrollFinishedRef.current = true
-      currentSceneSectionRef.current = sectionId
-
-      const nextSection = sectionOrder[sectionOrder.indexOf(sectionId) + 1]
-      speakAudio(
-        audioSceneForSection(sectionId),
-        () => {
-          if (!autoRunningRef.current) return
-          currentSceneSectionRef.current = null
-          audioEndedRef.current = true
-
-          if (!nextSection) {
-            stopAutoRun()
-            return
-          }
-          if (!scrollStartedRef.current) scrollToSection(nextSection)
-          else if (scrollFinishedRef.current) playSectionRef.current(nextSection)
-        },
-        stopAutoRun,
-      )
-    },
-    [scrollToSection, speakAudio, stopAutoRun],
-  )
-  useLayoutEffect(() => {
-    playSectionRef.current = playSection
-  }, [playSection])
-
-  const beginAutoRun = useCallback(
-    (sectionId: string, withReengagementCues: boolean) => {
-      autoRunningRef.current = true
-      audioEndedRef.current = false
-      scrollStartedRef.current = false
-      scrollFinishedRef.current = true
-      setAutoRunning(true)
-
-      if (!withReengagementCues) {
-        playSection(sectionId)
+    const tick = () => {
+      if (!autoRunningRef.current) {
+        monitorFrameRef.current = null
         return
       }
 
-      speakAudio(
-        'resume',
-        () =>
-          speakAudio(
-            'surprise',
-            () => playSection(sectionId),
-            stopAutoRun,
-          ),
-        stopAutoRun,
-      )
-    },
-    [playSection, speakAudio, stopAutoRun],
-  )
+      const audio = getAudio()
+      const nextId = nextSectionRef.current
+      if (audio && nextId && !transitionStartedRef.current) {
+        const duration = audio.duration
+        if (Number.isFinite(duration) && duration > 0) {
+          const nextSection = document.getElementById(nextId)
+          if (nextSection) {
+            const distance = Math.abs(
+              getSectionScrollTarget(nextSection) - window.scrollY,
+            )
+            const remaining = duration - audio.currentTime
+            if (remaining <= transitionSecondsFor(distance)) {
+              startTransition()
+            }
+          }
+        }
+      }
 
-  const interruptAutoRun = useCallback(() => {
+      monitorFrameRef.current = window.requestAnimationFrame(tick)
+    }
+
+    monitorFrameRef.current = window.requestAnimationFrame(tick)
+  }, [getAudio, startTransition])
+
+  const finishScene = useCallback(() => {
     if (!autoRunningRef.current) return
+    const nextId = nextSectionRef.current
+    cancelFrames()
 
-    stopAutoRun()
-    stopAudio()
-    speakAudio('paused')
-  }, [speakAudio, stopAudio, stopAutoRun])
-
-  useEffect(() => {
-    if (!autoRunning || !audioProgress.isPlaying) return
-    const sectionId = currentSceneSectionRef.current
-    if (
-      !sectionId ||
-      audioProgress.duration <= 0 ||
-      scrollStartedRef.current ||
-      audioProgress.duration - audioProgress.currentTime >
-        PRE_END_SCROLL_SECONDS
-    ) {
+    if (!nextId) {
+      stopRun()
       return
     }
 
-    const nextSection = sectionOrder[sectionOrder.indexOf(sectionId) + 1]
-    if (nextSection) scrollToSection(nextSection)
-  }, [
-    audioProgress.currentTime,
-    audioProgress.duration,
-    audioProgress.isPlaying,
-    autoRunning,
-    scrollToSection,
-  ])
+    const section = document.getElementById(nextId)
+    if (section) window.scrollTo(0, getSectionScrollTarget(section))
+    playSceneRef.current(nextId)
+  }, [cancelFrames, stopRun])
+
+  useLayoutEffect(() => {
+    finishSceneRef.current = finishScene
+  }, [finishScene])
+
+  const playScene = useCallback(
+    (sectionId: string) => {
+      if (!autoRunningRef.current) return
+
+      cancelFrames()
+      currentSectionRef.current = sectionId
+      transitionStartedRef.current = false
+
+      const index = sectionOrder.indexOf(sectionId)
+      const nextId = sectionOrder[index + 1] ?? null
+      nextSectionRef.current = nextId
+      if (nextId) preload(audioSceneForSection(nextId))
+
+      speakAudio(audioSceneForSection(sectionId), {
+        onEnded: () => finishSceneRef.current(),
+        onError: () => stopRun(),
+      })
+      startMonitor()
+    },
+    [cancelFrames, preload, speakAudio, startMonitor, stopRun],
+  )
+
+  useLayoutEffect(() => {
+    playSceneRef.current = playScene
+  }, [playScene])
+
+  const beginRun = useCallback(
+    (sectionId: string) => {
+      autoRunningRef.current = true
+      setAutoRunning(true)
+      playScene(sectionId)
+    },
+    [playScene],
+  )
+
+  const interruptRun = useCallback(() => {
+    if (!autoRunningRef.current) return
+    stopRun()
+    stopAudio()
+    speakAudio('paused')
+  }, [speakAudio, stopAudio, stopRun])
+
+  useEffect(() => {
+    return () => {
+      autoRunningRef.current = false
+      cancelFrames()
+    }
+  }, [cancelFrames])
 
   useEffect(() => {
     const isGuideControl = (target: EventTarget | null) =>
@@ -238,26 +263,32 @@ export function KaiGuide({
 
     const interruptOnPointerDown = (event: PointerEvent) => {
       if (isGuideControl(event.target)) return
-      interruptAutoRun()
+      interruptRun()
     }
     const interruptOnTouchStart = (event: TouchEvent) => {
       if (isGuideControl(event.target)) return
-      interruptAutoRun()
+      interruptRun()
     }
     const interruptOnKeyDown = (event: KeyboardEvent) => {
       if (isGuideControl(event.target)) return
       if (
-        ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(
-          event.key,
-        )
+        [
+          'ArrowDown',
+          'ArrowUp',
+          'PageDown',
+          'PageUp',
+          'Home',
+          'End',
+          ' ',
+        ].includes(event.key)
       ) {
-        interruptAutoRun()
+        interruptRun()
       }
     }
 
     document.addEventListener('pointerdown', interruptOnPointerDown, true)
     document.addEventListener('keydown', interruptOnKeyDown, true)
-    window.addEventListener('wheel', interruptAutoRun, { passive: true })
+    window.addEventListener('wheel', interruptRun, { passive: true })
     window.addEventListener('touchstart', interruptOnTouchStart, {
       passive: true,
     })
@@ -265,17 +296,17 @@ export function KaiGuide({
     return () => {
       document.removeEventListener('pointerdown', interruptOnPointerDown, true)
       document.removeEventListener('keydown', interruptOnKeyDown, true)
-      window.removeEventListener('wheel', interruptAutoRun)
+      window.removeEventListener('wheel', interruptRun)
       window.removeEventListener('touchstart', interruptOnTouchStart)
     }
-  }, [interruptAutoRun])
+  }, [interruptRun])
 
   function startAssistant() {
     if (!audioSupported || locale === 'en') return
-
     const sectionId = onStart()
     setStarted(true)
-    beginAutoRun(sectionId, false)
+    setOpen(true)
+    beginRun(sectionId)
   }
 
   function toggleAssistant() {
@@ -284,34 +315,18 @@ export function KaiGuide({
       startAssistant()
       return
     }
-
     if (autoRunningRef.current) {
-      interruptAutoRun()
+      interruptRun()
       return
     }
-
-    beginAutoRun(onStart(), true)
+    beginRun(onStart())
   }
 
   function closeGuide() {
-    stopAutoRun()
+    stopRun()
     setStarted(false)
     setOpen(false)
     stopAudio()
-  }
-
-  if (!open) {
-    return (
-      <button
-        type="button"
-        className="guide-restore"
-        onClick={() => setOpen(true)}
-        aria-label={t.guide.open}
-      >
-        <span aria-hidden="true">?</span>
-        <span>{t.guide.open}</span>
-      </button>
-    )
   }
 
   const phase: KaiPhase = !started
@@ -322,73 +337,119 @@ export function KaiGuide({
         ? 'project'
         : 'greeting'
 
+  const progressRatio =
+    audioProgress.duration > 0
+      ? clamp01(audioProgress.currentTime / audioProgress.duration)
+      : 0
+
+  const kaiLabel = !open
+    ? t.guide.open
+    : locale === 'en'
+      ? t.guide.unavailableInEnglish
+      : !started
+        ? t.guide.start
+        : autoRunning
+          ? t.guide.interrupt
+          : t.guide.continue
+
   return (
-    <aside className="guide" aria-label={t.guide.title}>
-      <div className="guide__bubble">
-        <div className="guide__bubble-head">
-          <p className="eyebrow guide__badge">
-            <span className="guide__spirit" aria-hidden="true" />
-            KAI <span className="guide__badge-label">{t.guide.title}</span>
-          </p>
-          <button
-            type="button"
-            className="guide__close"
-            onClick={closeGuide}
-            aria-label={t.guide.close}
-          >
-            ×
-          </button>
-        </div>
-
-        {locale === 'en' ? (
-          <p className="guide__message" role="status">
-            {t.guide.unavailableInEnglish}
-          </p>
-        ) : (
-          <>
-            {description && (
-              <p className="guide__message" role="status" aria-live="polite">
-                {description}
-              </p>
-            )}
-            {audioProgress.error && (
-              <p className="guide__error" role="alert">
-                {t.guide.audioError}
-              </p>
-            )}
-          </>
-        )}
-
-        {!started && locale === 'es' && (
-          <div className="guide__controls">
+    <aside
+      className={`guide ${open ? 'guide--open' : 'guide--closed'}`}
+      aria-label={t.guide.title}
+    >
+      {open && (
+        <div className="guide__bubble">
+          <div className="guide__bubble-head">
+            <p className="eyebrow guide__badge">
+              <span className="guide__spirit" aria-hidden="true" />
+              KAI <span className="guide__badge-label">{t.guide.title}</span>
+            </p>
             <button
               type="button"
-              className="guide__control guide__start"
-              onClick={startAssistant}
-              disabled={!audioSupported}
-              title={!audioSupported ? t.guide.unsupportedVoice : undefined}
+              className="guide__close"
+              onClick={closeGuide}
+              aria-label={t.guide.close}
             >
-              {t.guide.start}
+              <X size={14} aria-hidden="true" />
             </button>
           </div>
-        )}
-      </div>
+
+          {locale === 'en' ? (
+            <p className="guide__message" role="status">
+              {t.guide.unavailableInEnglish}
+            </p>
+          ) : (
+            <>
+              {description && (
+                <p className="guide__message" role="status" aria-live="polite">
+                  {description}
+                </p>
+              )}
+              {audioProgress.error && (
+                <p className="guide__error" role="alert">
+                  {t.guide.audioError}
+                </p>
+              )}
+              {audioProgress.duration > 0 && (
+                <div className="guide__progress" aria-hidden="true">
+                  <span style={{ transform: `scaleX(${progressRatio})` }} />
+                </div>
+              )}
+            </>
+          )}
+
+          {locale === 'es' && (
+            <div className="guide__controls">
+              {!started ? (
+                <button
+                  type="button"
+                  className="guide__control guide__start"
+                  onClick={startAssistant}
+                  disabled={!audioSupported}
+                  title={
+                    !audioSupported ? t.guide.unsupportedVoice : undefined
+                  }
+                >
+                  <Play size={12} aria-hidden="true" />
+                  {t.guide.start}
+                </button>
+              ) : autoRunning ? (
+                <button
+                  type="button"
+                  className="guide__control"
+                  onClick={interruptRun}
+                >
+                  <Pause size={12} aria-hidden="true" />
+                  {t.guide.interrupt}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="guide__control guide__start"
+                  onClick={toggleAssistant}
+                  disabled={!audioSupported}
+                >
+                  <Play size={12} aria-hidden="true" />
+                  {t.guide.continue}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {!open && (
+        <span className="guide__hint" aria-hidden="true">
+          {t.guide.open}
+        </span>
+      )}
 
       <button
         type="button"
         className="guide__kai-button"
-        onClick={toggleAssistant}
-        aria-label={
-          locale === 'en'
-            ? t.guide.unavailableInEnglish
-            : !started
-              ? t.guide.start
-              : autoRunning
-                ? t.guide.interrupt
-                : t.guide.continue
-        }
+        onClick={open ? toggleAssistant : () => setOpen(true)}
+        aria-label={kaiLabel}
         aria-pressed={autoRunning}
-        disabled={locale === 'en'}
       >
         <KaiCharacter phase={phase} talking={audioProgress.isPlaying} />
       </button>

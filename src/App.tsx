@@ -100,21 +100,22 @@ function Experience() {
           id="closing"
           className="closing"
           aria-labelledby="closing-title"
-          data-reveal
         >
-          <p className="eyebrow">{t.closing.eyebrow}</p>
-          <h2 id="closing-title" className="closing__title">
-            {t.closing.title}
-          </h2>
-          <p className="closing__description">{t.closing.description}</p>
-          <a
-            className="button button--primary"
-            href={portfolioUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {t.closing.cta} <span aria-hidden="true">↗</span>
-          </a>
+          <div className="closing__inner" data-reveal>
+            <p className="eyebrow">{t.closing.eyebrow}</p>
+            <h2 id="closing-title" className="closing__title">
+              {t.closing.title}
+            </h2>
+            <p className="closing__description">{t.closing.description}</p>
+            <a
+              className="button button--primary"
+              href={portfolioUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t.closing.cta} <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </section>
       </main>
 
