@@ -1,4 +1,4 @@
-import { AvatarGuide } from './components/AvatarGuide'
+import { KaiGuide } from './components/KaiGuide'
 import { ProjectChapter } from './components/ProjectChapter'
 import { ProjectNav } from './components/ProjectNav'
 import { projects } from './data/projects'
@@ -12,9 +12,19 @@ const portfolioUrl = 'https://jhaymayleth.github.io/#proyectos'
 function Experience() {
   const { locale, t } = useLanguage()
   useReveal()
-  const activeId = useActiveProject()
+  const {
+    activeId,
+    isHome,
+    isClosing,
+    refreshActiveSection,
+  } = useActiveProject()
   const activeProject =
     projects.find((project) => project.id === activeId) ?? null
+  const activeSection = isClosing
+    ? 'closing'
+    : isHome
+      ? 'inicio'
+      : 'project'
 
   return (
     <div className="experience-shell">
@@ -85,7 +95,12 @@ function Experience() {
           ))}
         </div>
 
-        <section className="closing" aria-labelledby="closing-title" data-reveal>
+        <section
+          id="closing"
+          className="closing"
+          aria-labelledby="closing-title"
+          data-reveal
+        >
           <p className="eyebrow">{t.closing.eyebrow}</p>
           <h2 id="closing-title" className="closing__title">
             {t.closing.title}
@@ -109,7 +124,11 @@ function Experience() {
         </a>
       </footer>
 
-      <AvatarGuide activeProject={activeProject} />
+      <KaiGuide
+        activeProject={activeProject}
+        activeSection={activeSection}
+        onStart={refreshActiveSection}
+      />
     </div>
   )
 }

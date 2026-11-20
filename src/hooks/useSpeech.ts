@@ -1,51 +1,95 @@
-import { useCallback, useEffect, useState } from 'react'
-import type { Locale } from '../types/content'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import type { ProjectId } from '../types/content'
 
-export function useSpeech(locale: Locale) {
+export type AudioScene = ProjectId | 'welcome' | 'closing'
+
+export interface AudioProgress {
+  isPlaying: boolean
+  error: boolean
+}
+
+const emptyProgress: AudioProgress = {
+  isPlaying: false,
+  error: false,
+}
+
+export function useSpeech() {
   const supported =
-    typeof window !== 'undefined' && 'speechSynthesis' in window
-  const [enabled, setEnabled] = useState(false)
-  const [speaking, setSpeaking] = useState(false)
+    typeof window !== 'undefined' &&
+    'Audio' in window
+  const [audioProgress, setAudioProgress] =
+    useState<AudioProgress>(emptyProgress)
+  const currentAudio = useRef<HTMLAudioElement | null>(null)
 
   const stop = useCallback(() => {
-    if (!supported) return
-    window.speechSynthesis.cancel()
-    setSpeaking(false)
-  }, [supported])
+    if (currentAudio.current) {
+      currentAudio.current.pause()
+      currentAudio.current.currentTime = 0
+      currentAudio.current = null
+    }
+    setAudioProgress(emptyProgress)
+  }, [])
 
   const speak = useCallback(
-    (text: string) => {
-      if (!supported || !enabled || !text) return
+    (
+      scene: AudioScene,
+      onEnded?: () => void,
+      onError?: () => void,
+    ) => {
+      if (!supported) return
 
-      window.speechSynthesis.cancel()
+      stop()
 
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = locale === 'es' ? 'es-ES' : 'en-US'
-      utterance.rate = 1
-      utterance.pitch = 1.05
+      const audioPath = `${import.meta.env.BASE_URL}audio/kai/es/${scene}.mp3`
+      const audio = new Audio(audioPath)
+      currentAudio.current = audio
+      setAudioProgress({
+        isPlaying: false,
+        error: false,
+      })
 
-      utterance.onstart = () => setSpeaking(true)
-      utterance.onend = () => setSpeaking(false)
-      utterance.onerror = () => setSpeaking(false)
+      audio.onplay = () => {
+        if (currentAudio.current !== audio) return
+        setAudioProgress((progress) => ({ ...progress, isPlaying: true }))
+      }
+      audio.onended = () => {
+        if (currentAudio.current !== audio) return
+        setAudioProgress((progress) => ({ ...progress, isPlaying: false }))
+        currentAudio.current = null
+        onEnded?.()
+      }
+      audio.onerror = () => {
+        if (currentAudio.current !== audio) return
+        currentAudio.current = null
+        setAudioProgress({
+          isPlaying: false,
+          error: true,
+        })
+        onError?.()
+      }
 
-      window.speechSynthesis.speak(utterance)
+      audio.play().catch(() => {
+        if (currentAudio.current !== audio) return
+        currentAudio.current = null
+        setAudioProgress({
+          isPlaying: false,
+          error: true,
+        })
+        onError?.()
+      })
     },
-    [enabled, locale, supported],
+    [stop, supported],
   )
 
   useEffect(() => {
-    if (!supported) return
-
     return () => {
-      window.speechSynthesis.cancel()
+      stop()
     }
-  }, [supported])
+  }, [stop])
 
   return {
     supported,
-    enabled,
-    setEnabled,
-    speaking,
+    audioProgress,
     speak,
     stop,
   }

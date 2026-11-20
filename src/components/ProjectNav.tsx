@@ -1,6 +1,5 @@
 import { projects } from '../data/projects'
 import { useLanguage } from '../i18n/useLanguage'
-import { LanguageToggle } from './LanguageToggle'
 
 interface ProjectNavProps {
   activeId: string | null
@@ -50,7 +49,6 @@ export function ProjectNav({ activeId }: ProjectNavProps) {
           >
             {t.nav.portfolio} <span aria-hidden="true">↗</span>
           </a>
-          <LanguageToggle />
         </div>
       </div>
     </header>

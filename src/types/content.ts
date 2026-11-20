@@ -1,4 +1,10 @@
 export type Locale = 'es' | 'en'
+export type ProjectId =
+  | 'muiska'
+  | 'mineroyal'
+  | 'multitenant'
+  | 'omegacomplex'
+  | 'alegria'
 
 export interface LocalizedText {
   es: string
@@ -6,7 +12,7 @@ export interface LocalizedText {
 }
 
 export interface Project {
-  id: string
+  id: ProjectId
   name: string
   tagline: LocalizedText
   stack: readonly string[]

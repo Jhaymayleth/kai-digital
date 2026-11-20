@@ -1,9 +1,49 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { projects } from '../data/projects'
 
-function projectIdFromHash(): string | null {
+const homeId = 'inicio'
+const closingId = 'closing'
+
+function sectionIdFromHash(): string | null {
   const id = window.location.hash.slice(1)
-  return projects.some((project) => project.id === id) ? id : null
+  return id === homeId || id === closingId || projects.some((project) => project.id === id)
+    ? id
+    : null
+}
+
+function currentSectionId(): string {
+  const markerY = window.innerHeight * 0.35
+  const sections = [homeId, ...projects.map((project) => project.id), closingId]
+    .map((id) => document.getElementById(id))
+    .filter((section): section is HTMLElement => section !== null)
+
+  const sectionAtMarker = sections.find((section) => {
+    const rect = section.getBoundingClientRect()
+    return rect.top <= markerY && rect.bottom > markerY
+  })
+
+  if (sectionAtMarker) return sectionAtMarker.id
+
+  return (
+    sections.reduce<HTMLElement | null>((nearest, section) => {
+      const rect = section.getBoundingClientRect()
+      const distance =
+        markerY < rect.top
+          ? rect.top - markerY
+          : markerY > rect.bottom
+            ? markerY - rect.bottom
+            : 0
+      if (!nearest) return section
+      const nearestRect = nearest.getBoundingClientRect()
+      const nearestDistance =
+        markerY < nearestRect.top
+          ? nearestRect.top - markerY
+          : markerY > nearestRect.bottom
+            ? markerY - nearestRect.bottom
+            : 0
+      return distance < nearestDistance ? section : nearest
+    }, null)?.id ?? homeId
+  )
 }
 
 function scrollBehavior(): ScrollBehavior {
@@ -13,23 +53,34 @@ function scrollBehavior(): ScrollBehavior {
 }
 
 export function useActiveProject() {
-  const [activeId, setActiveId] = useState<string | null>(() =>
-    projectIdFromHash(),
+  const [activeId, setActiveId] = useState<string>(() =>
+    sectionIdFromHash() ?? homeId,
   )
+  const refreshActiveSection = useCallback(() => {
+    const id = currentSectionId()
+    setActiveId(id)
+    return id
+  }, [])
 
   useEffect(() => {
-    const sections = projects
-      .map((project) => document.getElementById(project.id))
+    const sections = [homeId, ...projects.map((project) => project.id), closingId]
+      .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => section !== null)
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+    let updateTimer: number | null = null
 
-        if (visible[0]) setActiveId(visible[0].target.id)
-      },
+    const updateActiveSection = () => {
+      updateTimer = null
+      setActiveId(currentSectionId())
+    }
+
+    const scheduleActiveSectionUpdate = () => {
+      if (updateTimer !== null) window.clearTimeout(updateTimer)
+      updateTimer = window.setTimeout(updateActiveSection, 350)
+    }
+
+    const observer = new IntersectionObserver(
+      scheduleActiveSectionUpdate,
       {
         rootMargin: '-28% 0px -58% 0px',
         threshold: [0, 0.2, 0.5, 0.8],
@@ -38,21 +89,22 @@ export function useActiveProject() {
 
     sections.forEach((section) => observer.observe(section))
 
+    const onScroll = () => scheduleActiveSectionUpdate()
     const scrollToHash = () => {
-      const id = projectIdFromHash()
+      const id = sectionIdFromHash()
       if (!id) {
-        setActiveId(null)
+        scheduleActiveSectionUpdate()
         return
       }
 
-      setActiveId(id)
       document.getElementById(id)?.scrollIntoView({
         behavior: scrollBehavior(),
         block: 'start',
       })
+      scheduleActiveSectionUpdate()
     }
 
-    const initialId = projectIdFromHash()
+    const initialId = sectionIdFromHash()
     if (initialId) {
       requestAnimationFrame(() => {
         document.getElementById(initialId)?.scrollIntoView({
@@ -61,13 +113,22 @@ export function useActiveProject() {
       })
     }
 
+    window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('hashchange', scrollToHash)
+    scheduleActiveSectionUpdate()
 
     return () => {
+      if (updateTimer !== null) window.clearTimeout(updateTimer)
       observer.disconnect()
+      window.removeEventListener('scroll', onScroll)
       window.removeEventListener('hashchange', scrollToHash)
     }
   }, [])
 
-  return activeId
+  return {
+    activeId,
+    isHome: activeId === homeId,
+    isClosing: activeId === closingId,
+    refreshActiveSection,
+  }
 }
