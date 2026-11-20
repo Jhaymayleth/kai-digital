@@ -1,0 +1,2 @@
+c00ae1bfcb9fb13a3b0195089606a4c3b6b8012059105cee16c9212fde614a73  design/mascota/05-animacion/D_rig/work/00_input/candidate_kai_idle.webp
+20f2ae34c584bdd87527450affb34be0f0c69b8f20ac89517b20c62b515c6c58  design/mascota/05-animacion/D_rig/work/00_input/candidate_shared_og_cover.webp

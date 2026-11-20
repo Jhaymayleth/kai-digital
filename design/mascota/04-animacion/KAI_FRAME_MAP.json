@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 1,
+  "character": "KAI",
+  "document": "Frame map for expression, pose, and motion production",
+  "status": "working-proposal",
+  "references": [
+    "../KAI_VISUAL_DESIGN.md",
+    "../03-hojas-expresiones/KAI_EXPRESSION_MAP.md",
+    "../KAI_PRODUCTION_PLAN.md"
+  ],
+  "constraints": {
+    "anatomicalHeightHeads": 2.5,
+    "palette": {
+      "sumi": "#0E100F",
+      "washi": "#F7F5F0",
+      "smokeGray": "#B8B0A5",
+      "crimson": "#A51C30",
+      "amber": "#D6A441"
+    },
+    "hairWhiteLocks": "Keep S1, S2, and S3 anchored to their approved anatomical sides in every frame.",
+    "ribbon": "Keep the central rear knot and two unequal flat tails; animate with delayed follow-through.",
+    "frameArtwork": "Not included. This map describes new separated drawings; existing WebP reference sprites are not modified or treated as animation frames."
+  },
+  "productionDefaults": {
+    "fps": 12,
+    "fpsStatus": "proposed; confirm during pipeline test D.0",
+    "canvas": "match the approved source model; final pixel dimensions TBD",
+    "transparentBackground": true,
+    "coordinateUnit": "degrees for rotation; percent of anatomical character height for translation",
+    "interpolation": "ease-in-out for body arcs; stepped holds for facial poses unless specified"
+  },
+  "layersBackToFront": [
+    "effects",
+    "ribbon_tails",
+    "hair_back",
+    "legs_and_shoes",
+    "torso_and_haori",
+    "neck_and_face_base",
+    "eyes_brows_mouth",
+    "hair_front_S1_S2",
+    "arms_and_hands",
+    "ribbon_knot"
+  ],
+  "expressionMap": [
+    { "id": "EXP-01", "name": "Base Neutral", "eyes": "open-neutral", "brows": "relaxed", "mouth": "closed-neutral", "headTiltDeg": 0 },
+    { "id": "EXP-02", "name": "Curiosidad", "eyes": "open-attentive", "brows": "asymmetric-raised", "mouth": "small-o", "headTiltDeg": 9 },
+    { "id": "EXP-03", "name": "Travesura", "eyes": "one-wink-one-side-glance", "brows": "asymmetric-playful", "mouth": "side-smile", "headTiltDeg": -6 },
+    { "id": "EXP-04", "name": "Sorpresa", "eyes": "wide-small-pupils", "brows": "raised", "mouth": "round-o", "headTiltDeg": -3 },
+    { "id": "EXP-05", "name": "Alegria-Celebracion", "eyes": "smiling-arcs-or-bright-open", "brows": "high-relaxed", "mouth": "open-smile", "headTiltDeg": 2 },
+    { "id": "EXP-06", "name": "Concentracion-Senalar", "eyes": "focused-half-lids", "brows": "low-focused", "mouth": "firm-line", "headTiltDeg": 0 },
+    { "id": "EXP-07", "name": "Orgullo", "eyes": "confident-half-lids", "brows": "one-slightly-raised", "mouth": "calm-side-smile", "headTiltDeg": 6 },
+    { "id": "EXP-08", "name": "Somnoliento-Descanso", "eyes": "lids-cover-75-to-80-percent", "brows": "relaxed-low", "mouth": "small-neutral", "headTiltDeg": 5 },
+    { "id": "EXP-09", "name": "Confusion-Duda", "eyes": "asymmetric-off-center", "brows": "asymmetric-question", "mouth": "subtle-wave", "headTiltDeg": -10 },
+    { "id": "EXP-10", "name": "Decision", "eyes": "fixed-resolved", "brows": "low-converging", "mouth": "firm-closed", "headTiltDeg": -3 }
+  ],
+  "sequences": [
+    {
+      "id": "idle",
+      "group": "E1",
+      "type": "loop",
+      "fps": 12,
+      "frameCount": 24,
+      "durationMs": 2000,
+      "expression": "EXP-01",
+      "keyframes": [
+        { "frame": 0, "pose": "neutral", "bodyYPercent": 0, "torsoScaleY": 1, "headTiltDeg": 0, "arms": "relaxed" },
+        { "frame": 6, "pose": "inhale", "bodyYPercent": -0.5, "torsoScaleY": 1.01, "headTiltDeg": 0, "arms": "follow-up-1deg" },
+        { "frame": 12, "pose": "settle", "bodyYPercent": 0, "torsoScaleY": 1, "headTiltDeg": 0, "arms": "relaxed" },
+        { "frame": 18, "pose": "exhale", "bodyYPercent": 0.35, "torsoScaleY": 0.995, "headTiltDeg": 0, "arms": "follow-up-1deg" },
+        { "frame": 23, "pose": "return", "bodyYPercent": 0, "torsoScaleY": 1, "headTiltDeg": 0, "arms": "relaxed" }
+      ],
+      "secondaryMotion": ["soft-hair-sway", "ribbon-delayed-sway", "occasional-blink-overlay"],
+      "notes": "Keep the breathing amplitude very small. Do not bob continuously while the idle loop is active."
+    },
+    {
+      "id": "blink",
+      "group": "E1",
+      "type": "one-shot-overlay",
+      "fps": 12,
+      "frameCount": 4,
+      "durationMs": 333,
+      "expression": "EXP-01",
+      "keyframes": [
+        { "frame": 0, "eyes": "open" },
+        { "frame": 1, "eyes": "half-closed" },
+        { "frame": 2, "eyes": "closed" },
+        { "frame": 3, "eyes": "open" }
+      ],
+      "secondaryMotion": [],
+      "notes": "Eye layers only; preserve iris color, pupil placement, and hair anchors."
+    },
+    {
+      "id": "speak-soft",
+      "group": "E1",
+      "type": "loop-overlay",
+      "fps": 12,
+      "frameCount": 8,
+      "durationMs": 667,
+      "expression": "EXP-01",
+      "keyframes": [
+        { "frame": 0, "mouth": "closed" },
+        { "frame": 2, "mouth": "small-open" },
+        { "frame": 4, "mouth": "open" },
+        { "frame": 6, "mouth": "small-o" },
+        { "frame": 7, "mouth": "closed" }
+      ],
+      "secondaryMotion": ["single-soft-head-nod", "one-hand-small-emphasis"],
+      "notes": "A restrained visual speaking loop only; it is not phoneme-accurate lip sync and does not change audio playback."
+    },
+    {
+      "id": "walk",
+      "group": "E1",
+      "type": "loop",
+      "fps": 12,
+      "frameCount": 12,
+      "durationMs": 1000,
+      "expression": "EXP-02",
+      "keyframes": [
+        { "frame": 0, "pose": "left-contact", "leftLegDeg": -18, "rightLegDeg": 18, "leftArmDeg": 14, "rightArmDeg": -14, "bodyYPercent": 0 },
+        { "frame": 3, "pose": "left-pass", "leftLegDeg": 0, "rightLegDeg": 0, "leftArmDeg": 0, "rightArmDeg": 0, "bodyYPercent": -0.7 },
+        { "frame": 6, "pose": "right-contact", "leftLegDeg": 18, "rightLegDeg": -18, "leftArmDeg": -14, "rightArmDeg": 14, "bodyYPercent": 0 },
+        { "frame": 9, "pose": "right-pass", "leftLegDeg": 0, "rightLegDeg": 0, "leftArmDeg": 0, "rightArmDeg": 0, "bodyYPercent": -0.7 },
+        { "frame": 11, "pose": "close", "leftLegDeg": -12, "rightLegDeg": 12, "leftArmDeg": 9, "rightArmDeg": -9, "bodyYPercent": 0 }
+      ],
+      "secondaryMotion": ["head-counter-rotation", "hair-lag-2-frames", "ribbon-trail-opposite-travel"],
+      "notes": "Use readable foot contacts and short strides. These angles are starting values for the separated rig, not approved anatomy measurements."
+    },
+    {
+      "id": "run",
+      "group": "E1",
+      "type": "loop",
+      "fps": 12,
+      "frameCount": 8,
+      "durationMs": 667,
+      "expression": "EXP-02",
+      "keyframes": [
+        { "frame": 0, "pose": "left-contact", "leftLegDeg": -30, "rightLegDeg": 28, "leftArmDeg": 24, "rightArmDeg": -22, "bodyYPercent": 0 },
+        { "frame": 2, "pose": "air", "leftLegDeg": -8, "rightLegDeg": 10, "leftArmDeg": 8, "rightArmDeg": -8, "bodyYPercent": -2 },
+        { "frame": 4, "pose": "right-contact", "leftLegDeg": 28, "rightLegDeg": -30, "leftArmDeg": -22, "rightArmDeg": 24, "bodyYPercent": 0 },
+        { "frame": 6, "pose": "air", "leftLegDeg": 10, "rightLegDeg": -8, "leftArmDeg": -8, "rightArmDeg": 8, "bodyYPercent": -2 },
+        { "frame": 7, "pose": "close", "leftLegDeg": 18, "rightLegDeg": -18, "leftArmDeg": -14, "rightArmDeg": 14, "bodyYPercent": 0 }
+      ],
+      "secondaryMotion": ["hair-trails-back", "ribbon-trails-back", "short-controlled-overshoot"],
+      "notes": "More energetic than walk, but keep the head readable and avoid long airborne holds."
+    },
+    {
+      "id": "jump",
+      "group": "E1",
+      "type": "one-shot",
+      "fps": 12,
+      "frameCount": 10,
+      "durationMs": 833,
+      "expression": "EXP-05",
+      "keyframes": [
+        { "frame": 0, "pose": "anticipation", "bodyYPercent": 0, "torsoScaleY": 0.98, "arms": "draw-back", "legs": "bend" },
+        { "frame": 2, "pose": "takeoff", "bodyYPercent": -0.8, "torsoScaleY": 1.02, "arms": "rise", "legs": "extend" },
+        { "frame": 5, "pose": "apex", "bodyYPercent": -5, "arms": "open-up", "legs": "tuck-lightly" },
+        { "frame": 7, "pose": "descent", "bodyYPercent": -3, "arms": "lower", "legs": "prepare-contact" },
+        { "frame": 9, "pose": "settle", "bodyYPercent": 0, "arms": "relaxed", "legs": "straight" }
+      ],
+      "secondaryMotion": ["hair-delayed-rise", "ribbon-follow-through"],
+      "notes": "Keep the silhouette compact; the head and hair must not stretch or change the 2.5-head anatomy."
+    },
+    {
+      "id": "land",
+      "group": "E1",
+      "type": "one-shot",
+      "fps": 12,
+      "frameCount": 8,
+      "durationMs": 667,
+      "expression": "EXP-04",
+      "keyframes": [
+        { "frame": 0, "pose": "pre-contact", "bodyYPercent": -2, "legs": "ready" },
+        { "frame": 2, "pose": "contact", "bodyYPercent": 0, "torsoScaleY": 0.96, "legs": "compress" },
+        { "frame": 4, "pose": "rebound", "bodyYPercent": -0.7, "torsoScaleY": 1.01, "legs": "release" },
+        { "frame": 7, "pose": "settle", "bodyYPercent": 0, "torsoScaleY": 1, "legs": "neutral" }
+      ],
+      "secondaryMotion": ["hair-rebound", "ribbon-lag-2-frames"],
+      "notes": "A soft cushion and quick recovery, never a hard impact or violent shake."
+    },
+    {
+      "id": "wave",
+      "group": "E1",
+      "type": "one-shot",
+      "fps": 12,
+      "frameCount": 12,
+      "durationMs": 1000,
+      "expression": "EXP-02",
+      "keyframes": [
+        { "frame": 0, "pose": "rest", "rightArmDeg": 0, "rightElbowDeg": 10 },
+        { "frame": 2, "pose": "raise", "rightArmDeg": -28, "rightElbowDeg": 35 },
+        { "frame": 4, "pose": "wave-left", "rightArmDeg": -34, "rightElbowDeg": 50, "handYawDeg": -12 },
+        { "frame": 6, "pose": "wave-right", "rightArmDeg": -34, "rightElbowDeg": 50, "handYawDeg": 12 },
+        { "frame": 8, "pose": "wave-left", "rightArmDeg": -34, "rightElbowDeg": 50, "handYawDeg": -12 },
+        { "frame": 11, "pose": "return", "rightArmDeg": 0, "rightElbowDeg": 10 }
+      ],
+      "secondaryMotion": ["wrist-soft-follow-through", "head-tilt-3deg"],
+      "notes": "Gesture from shoulder and elbow; keep the palm and thumb legible."
+    },
+    {
+      "id": "point",
+      "group": "E1",
+      "type": "one-shot-with-hold",
+      "fps": 12,
+      "frameCount": 10,
+      "durationMs": 833,
+      "expression": "EXP-06",
+      "keyframes": [
+        { "frame": 0, "pose": "rest", "rightArmDeg": 0 },
+        { "frame": 2, "pose": "lift", "rightArmDeg": -24, "rightElbowDeg": 45 },
+        { "frame": 4, "pose": "point", "rightArmDeg": -36, "rightElbowDeg": 18, "indexFinger": "extended" },
+        { "frame": 8, "pose": "hold", "rightArmDeg": -36, "rightElbowDeg": 18, "indexFinger": "extended" },
+        { "frame": 9, "pose": "return", "rightArmDeg": 0, "rightElbowDeg": 10, "indexFinger": "relaxed" }
+      ],
+      "secondaryMotion": ["gaze-to-target", "ribbon-settle"],
+      "notes": "Orient the torso and gaze toward the target; do not make the pointing pose a rigid arm-only gesture."
+    },
+    {
+      "id": "think",
+      "group": "E2",
+      "type": "loop",
+      "fps": 12,
+      "frameCount": 16,
+      "durationMs": 1333,
+      "expression": "EXP-09",
+      "keyframes": [
+        { "frame": 0, "pose": "settle", "headTiltDeg": -8, "leftHand": "near-chin" },
+        { "frame": 4, "pose": "look-up", "headTiltDeg": -10, "gaze": "upper-left" },
+        { "frame": 8, "pose": "consider", "headTiltDeg": -6, "gaze": "center" },
+        { "frame": 12, "pose": "small-nod", "headTiltDeg": -8, "gaze": "center" },
+        { "frame": 15, "pose": "close", "headTiltDeg": -8, "leftHand": "near-chin" }
+      ],
+      "secondaryMotion": ["one-blink-per-cycle", "minimal-hair-follow-through"],
+      "notes": "Keep the hand away from the face silhouette enough to preserve a clean read at small size."
+    },
+    {
+      "id": "celebrate",
+      "group": "E2",
+      "type": "one-shot",
+      "fps": 12,
+      "frameCount": 12,
+      "durationMs": 1000,
+      "expression": "EXP-05",
+      "keyframes": [
+        { "frame": 0, "pose": "anticipate", "arms": "draw-in", "legs": "bend" },
+        { "frame": 3, "pose": "open", "arms": "both-up", "legs": "extend", "bodyYPercent": -1 },
+        { "frame": 5, "pose": "peak", "arms": "both-up-open", "legs": "light-hop", "bodyYPercent": -3 },
+        { "frame": 8, "pose": "release", "arms": "lower-softly", "legs": "settle" },
+        { "frame": 11, "pose": "close", "arms": "relaxed", "legs": "neutral" }
+      ],
+      "secondaryMotion": ["hair-bounce", "ribbon-delayed-3-frames"],
+      "notes": "One buoyant, contained celebration; do not loop the jump indefinitely."
+    },
+    {
+      "id": "sit",
+      "group": "E2",
+      "type": "one-shot-with-hold",
+      "fps": 12,
+      "frameCount": 10,
+      "durationMs": 833,
+      "expression": "EXP-01",
+      "keyframes": [
+        { "frame": 0, "pose": "stand" },
+        { "frame": 3, "pose": "lower", "hips": "back", "knees": "bend" },
+        { "frame": 6, "pose": "sit", "legs": "forward-soft", "hands": "rest-on-thighs" },
+        { "frame": 9, "pose": "settle", "headTiltDeg": 1 }
+      ],
+      "secondaryMotion": ["hair-settle", "ribbon-fall-with-gravity"],
+      "notes": "The seated drawing is a distinct pose key; do not force the standing legs into a seated silhouette."
+    },
+    {
+      "id": "fall-comic",
+      "group": "E2",
+      "type": "one-shot",
+      "fps": 12,
+      "frameCount": 12,
+      "durationMs": 1000,
+      "expression": "EXP-04",
+      "keyframes": [
+        { "frame": 0, "pose": "trip", "bodyTiltDeg": -8, "arms": "catch-balance" },
+        { "frame": 3, "pose": "lose-balance", "bodyTiltDeg": 18, "arms": "out" },
+        { "frame": 6, "pose": "impact-soft", "bodyTiltDeg": 24, "legs": "tucked", "bodyYPercent": 0 },
+        { "frame": 8, "pose": "recoil", "bodyTiltDeg": 12, "headTiltDeg": -4 },
+        { "frame": 11, "pose": "recover", "bodyTiltDeg": 0, "arms": "steady" }
+      ],
+      "secondaryMotion": ["hair-late-rebound", "ribbon-settle"],
+      "notes": "Comedic and harmless, with a cushioned impact and no violent shake."
+    },
+    {
+      "id": "peek",
+      "group": "E2",
+      "type": "one-shot-with-hold",
+      "fps": 12,
+      "frameCount": 10,
+      "durationMs": 833,
+      "expression": "EXP-02",
+      "keyframes": [
+        { "frame": 0, "pose": "hidden" },
+        { "frame": 3, "pose": "rise", "headTiltDeg": 7, "gaze": "toward-viewer" },
+        { "frame": 6, "pose": "peek", "headTiltDeg": 9, "leftHand": "edge-support" },
+        { "frame": 8, "pose": "hold", "headTiltDeg": 9 },
+        { "frame": 9, "pose": "leave", "headTiltDeg": 0 }
+      ],
+      "secondaryMotion": ["hair-follow-through", "small-wave-on-hold"],
+      "notes": "Requires a layout edge and a separate upper-body pose; final crop and entry side are integration decisions."
+    },
+    {
+      "id": "sleep",
+      "group": "E2",
+      "type": "loop",
+      "fps": 12,
+      "frameCount": 24,
+      "durationMs": 2000,
+      "expression": "EXP-08",
+      "keyframes": [
+        { "frame": 0, "pose": "settled", "headTiltDeg": 5, "bodyYPercent": 0 },
+        { "frame": 8, "pose": "inhale", "headTiltDeg": 5, "bodyYPercent": -0.3 },
+        { "frame": 12, "pose": "soft-drop", "headTiltDeg": 7, "bodyYPercent": 0.2 },
+        { "frame": 20, "pose": "exhale", "headTiltDeg": 5, "bodyYPercent": 0 },
+        { "frame": 23, "pose": "close", "headTiltDeg": 5, "bodyYPercent": 0 }
+      ],
+      "secondaryMotion": ["ribbon-rests-downward", "one-slow-blink-at-cycle-boundary"],
+      "notes": "Use only after an inactivity trigger; keep the idle state attentive by default."
+    }
+  ],
+  "frameProductionChecklist": [
+    "Create separated drawings for head, torso, both arms/hands, both legs/shoes, front/back hair, and ribbon.",
+    "Add face layers for brows, eyelids, eyes, pupils/highlights, and the mouth shapes used by speak-soft.",
+    "Record pivots on the approved model before applying rotations; numeric ranges here are rough blocking only.",
+    "Check silhouette, line-art continuity, five-color palette, S1/S2/S3 anchors, and ribbon readability at 32 px and 128 px.",
+    "Export transparent frame previews and the final sprite atlas only after the source layers are approved."
+  ]
+}

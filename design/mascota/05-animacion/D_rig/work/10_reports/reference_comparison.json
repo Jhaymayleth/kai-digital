@@ -1,0 +1,818 @@
+{
+  "generated_by": "scripts/analyze_reference.py",
+  "workspace": "/home/ruta_ts/Escritorio/experiencias/design/mascota/05-animacion/D_rig/work",
+  "candidates": {
+    "kai_idle": {
+      "name": "kai_idle",
+      "source": "00_input/candidate_kai_idle.webp",
+      "sha256": "c00ae1bfcb9fb13a3b0195089606a4c3b6b8012059105cee16c9212fde614a73",
+      "dimensions": [
+        429,
+        939
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        12,
+        12,
+        417,
+        927
+      ],
+      "bbox_center": [
+        214.5,
+        469.5
+      ],
+      "ground_anchor_y": 927,
+      "opaque_pixels": 231690,
+      "color": {
+        "opaque_pixels": 231690,
+        "top_colours_quantized": [
+          {
+            "rgb": [
+              16,
+              16,
+              16
+            ],
+            "hex": "#101010",
+            "pixels": 71120,
+            "percent": 30.696
+          },
+          {
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "hex": "#000000",
+            "pixels": 29757,
+            "percent": 12.843
+          },
+          {
+            "rgb": [
+              16,
+              24,
+              16
+            ],
+            "hex": "#101810",
+            "pixels": 29581,
+            "percent": 12.767
+          },
+          {
+            "rgb": [
+              240,
+              232,
+              208
+            ],
+            "hex": "#F0E8D0",
+            "pixels": 9496,
+            "percent": 4.099
+          },
+          {
+            "rgb": [
+              240,
+              232,
+              224
+            ],
+            "hex": "#F0E8E0",
+            "pixels": 7513,
+            "percent": 3.243
+          },
+          {
+            "rgb": [
+              240,
+              240,
+              232
+            ],
+            "hex": "#F0F0E8",
+            "pixels": 7094,
+            "percent": 3.062
+          },
+          {
+            "rgb": [
+              240,
+              232,
+              216
+            ],
+            "hex": "#F0E8D8",
+            "pixels": 5893,
+            "percent": 2.543
+          },
+          {
+            "rgb": [
+              240,
+              240,
+              224
+            ],
+            "hex": "#F0F0E0",
+            "pixels": 5112,
+            "percent": 2.206
+          },
+          {
+            "rgb": [
+              8,
+              8,
+              8
+            ],
+            "hex": "#080808",
+            "pixels": 3368,
+            "percent": 1.454
+          },
+          {
+            "rgb": [
+              8,
+              16,
+              16
+            ],
+            "hex": "#081010",
+            "pixels": 3045,
+            "percent": 1.314
+          },
+          {
+            "rgb": [
+              8,
+              0,
+              0
+            ],
+            "hex": "#080000",
+            "pixels": 2786,
+            "percent": 1.202
+          },
+          {
+            "rgb": [
+              176,
+              168,
+              152
+            ],
+            "hex": "#B0A898",
+            "pixels": 1986,
+            "percent": 0.857
+          },
+          {
+            "rgb": [
+              8,
+              8,
+              0
+            ],
+            "hex": "#080800",
+            "pixels": 1936,
+            "percent": 0.836
+          },
+          {
+            "rgb": [
+              232,
+              232,
+              216
+            ],
+            "hex": "#E8E8D8",
+            "pixels": 1770,
+            "percent": 0.764
+          },
+          {
+            "rgb": [
+              232,
+              232,
+              224
+            ],
+            "hex": "#E8E8E0",
+            "pixels": 1659,
+            "percent": 0.716
+          }
+        ],
+        "palette_coverage": {
+          "sumi": {
+            "pixels": 158915,
+            "percent": 68.589,
+            "within_12": 98499,
+            "within_24": 141509,
+            "within_48": 155517
+          },
+          "washi": {
+            "pixels": 47285,
+            "percent": 20.409,
+            "within_12": 15839,
+            "within_24": 31657,
+            "within_48": 46760
+          },
+          "smoke": {
+            "pixels": 12289,
+            "percent": 5.304,
+            "within_12": 4873,
+            "within_24": 7850,
+            "within_48": 9763
+          },
+          "crimson": {
+            "pixels": 12508,
+            "percent": 5.399,
+            "within_12": 0,
+            "within_24": 1632,
+            "within_48": 6003
+          },
+          "amber": {
+            "pixels": 693,
+            "percent": 0.299,
+            "within_12": 13,
+            "within_24": 158,
+            "within_48": 499
+          }
+        },
+        "within_12_percent": 51.458,
+        "within_24_percent": 78.901,
+        "within_48_percent": 94.325,
+        "median_distance": 11.747,
+        "mean_distance": 17.856
+      },
+      "landmarks": {
+        "image_size": [
+          429,
+          939
+        ],
+        "alpha_bbox": [
+          12,
+          12,
+          417,
+          927
+        ],
+        "eye_clusters": [
+          {
+            "id": 2,
+            "bbox": [
+              126,
+              207,
+              155,
+              242
+            ],
+            "area": 644,
+            "centroid": [
+              139.73,
+              225.14
+            ],
+            "aspect": 0.829
+          },
+          {
+            "id": 1,
+            "bbox": [
+              227,
+              205,
+              260,
+              241
+            ],
+            "area": 836,
+            "centroid": [
+              243.43,
+              222.38
+            ],
+            "aspect": 0.917
+          }
+        ],
+        "face_component": {
+          "id": 32,
+          "bbox": [
+            103,
+            178,
+            280,
+            311
+          ],
+          "area": 12629,
+          "centroid": [
+            190.24,
+            253.25
+          ],
+          "aspect": 1.331
+        },
+        "white_streak_candidates": [
+          {
+            "id": 10,
+            "bbox": [
+              68,
+              46,
+              181,
+              339
+            ],
+            "area": 5377,
+            "centroid": [
+              96.69,
+              168.66
+            ],
+            "aspect": 0.386
+          },
+          {
+            "id": 12,
+            "bbox": [
+              138,
+              48,
+              200,
+              218
+            ],
+            "area": 4155,
+            "centroid": [
+              161.0,
+              131.14
+            ],
+            "aspect": 0.365
+          },
+          {
+            "id": 128,
+            "bbox": [
+              170,
+              352,
+              229,
+              422
+            ],
+            "area": 1763,
+            "centroid": [
+              201.89,
+              388.99
+            ],
+            "aspect": 0.843
+          },
+          {
+            "id": 119,
+            "bbox": [
+              230,
+              338,
+              251,
+              422
+            ],
+            "area": 1360,
+            "centroid": [
+              239.88,
+              382.65
+            ],
+            "aspect": 0.25
+          },
+          {
+            "id": 124,
+            "bbox": [
+              131,
+              343,
+              161,
+              422
+            ],
+            "area": 986,
+            "centroid": [
+              144.97,
+              384.65
+            ],
+            "aspect": 0.38
+          },
+          {
+            "id": 129,
+            "bbox": [
+              160,
+              354,
+              183,
+              416
+            ],
+            "area": 875,
+            "centroid": [
+              170.28,
+              382.31
+            ],
+            "aspect": 0.371
+          },
+          {
+            "id": 134,
+            "bbox": [
+              200,
+              376,
+              228,
+              422
+            ],
+            "area": 551,
+            "centroid": [
+              216.38,
+              405.9
+            ],
+            "aspect": 0.609
+          },
+          {
+            "id": 55,
+            "bbox": [
+              103,
+              208,
+              136,
+              267
+            ],
+            "area": 449,
+            "centroid": [
+              118.84,
+              231.32
+            ],
+            "aspect": 0.559
+          }
+        ]
+      }
+    },
+    "shared_og_cover": {
+      "name": "shared_og_cover",
+      "source": "00_input/candidate_shared_og_cover.webp",
+      "sha256": "20f2ae34c584bdd87527450affb34be0f0c69b8f20ac89517b20c62b515c6c58",
+      "dimensions": [
+        469,
+        939
+      ],
+      "mode": "RGBA",
+      "alpha_bbox": [
+        12,
+        12,
+        457,
+        927
+      ],
+      "bbox_center": [
+        234.5,
+        469.5
+      ],
+      "ground_anchor_y": 927,
+      "opaque_pixels": 239110,
+      "color": {
+        "opaque_pixels": 239110,
+        "top_colours_quantized": [
+          {
+            "rgb": [
+              16,
+              24,
+              16
+            ],
+            "hex": "#101810",
+            "pixels": 66335,
+            "percent": 27.742
+          },
+          {
+            "rgb": [
+              16,
+              16,
+              16
+            ],
+            "hex": "#101010",
+            "pixels": 30740,
+            "percent": 12.856
+          },
+          {
+            "rgb": [
+              0,
+              0,
+              0
+            ],
+            "hex": "#000000",
+            "pixels": 25964,
+            "percent": 10.859
+          },
+          {
+            "rgb": [
+              240,
+              232,
+              224
+            ],
+            "hex": "#F0E8E0",
+            "pixels": 7918,
+            "percent": 3.311
+          },
+          {
+            "rgb": [
+              240,
+              240,
+              232
+            ],
+            "hex": "#F0F0E8",
+            "pixels": 6425,
+            "percent": 2.687
+          },
+          {
+            "rgb": [
+              8,
+              8,
+              8
+            ],
+            "hex": "#080808",
+            "pixels": 6029,
+            "percent": 2.521
+          },
+          {
+            "rgb": [
+              240,
+              232,
+              208
+            ],
+            "hex": "#F0E8D0",
+            "pixels": 4702,
+            "percent": 1.966
+          },
+          {
+            "rgb": [
+              24,
+              24,
+              24
+            ],
+            "hex": "#181818",
+            "pixels": 3798,
+            "percent": 1.588
+          },
+          {
+            "rgb": [
+              232,
+              232,
+              216
+            ],
+            "hex": "#E8E8D8",
+            "pixels": 2846,
+            "percent": 1.19
+          },
+          {
+            "rgb": [
+              232,
+              232,
+              224
+            ],
+            "hex": "#E8E8E0",
+            "pixels": 2810,
+            "percent": 1.175
+          },
+          {
+            "rgb": [
+              8,
+              8,
+              0
+            ],
+            "hex": "#080800",
+            "pixels": 2793,
+            "percent": 1.168
+          },
+          {
+            "rgb": [
+              240,
+              224,
+              200
+            ],
+            "hex": "#F0E0C8",
+            "pixels": 2572,
+            "percent": 1.076
+          },
+          {
+            "rgb": [
+              8,
+              0,
+              0
+            ],
+            "hex": "#080000",
+            "pixels": 2567,
+            "percent": 1.074
+          },
+          {
+            "rgb": [
+              240,
+              232,
+              216
+            ],
+            "hex": "#F0E8D8",
+            "pixels": 2521,
+            "percent": 1.054
+          },
+          {
+            "rgb": [
+              16,
+              24,
+              24
+            ],
+            "hex": "#101818",
+            "pixels": 2449,
+            "percent": 1.024
+          }
+        ],
+        "palette_coverage": {
+          "sumi": {
+            "pixels": 163842,
+            "percent": 68.522,
+            "within_12": 78830,
+            "within_24": 149996,
+            "within_48": 159509
+          },
+          "washi": {
+            "pixels": 45855,
+            "percent": 19.177,
+            "within_12": 12930,
+            "within_24": 28284,
+            "within_48": 44367
+          },
+          "smoke": {
+            "pixels": 15954,
+            "percent": 6.672,
+            "within_12": 3756,
+            "within_24": 8366,
+            "within_48": 11311
+          },
+          "crimson": {
+            "pixels": 12765,
+            "percent": 5.339,
+            "within_12": 0,
+            "within_24": 6,
+            "within_48": 4181
+          },
+          "amber": {
+            "pixels": 694,
+            "percent": 0.29,
+            "within_12": 0,
+            "within_24": 49,
+            "within_48": 414
+          }
+        },
+        "within_12_percent": 39.946,
+        "within_24_percent": 78.082,
+        "within_48_percent": 91.917,
+        "median_distance": 12.806,
+        "mean_distance": 20.019
+      },
+      "landmarks": {
+        "image_size": [
+          469,
+          939
+        ],
+        "alpha_bbox": [
+          12,
+          12,
+          457,
+          927
+        ],
+        "eye_clusters": [
+          {
+            "id": 15,
+            "bbox": [
+              158,
+              204,
+              192,
+              265
+            ],
+            "area": 870,
+            "centroid": [
+              172.44,
+              239.88
+            ],
+            "aspect": 1.5
+          },
+          {
+            "id": 1,
+            "bbox": [
+              264,
+              201,
+              300,
+              261
+            ],
+            "area": 986,
+            "centroid": [
+              285.04,
+              236.5
+            ],
+            "aspect": 0.892
+          }
+        ],
+        "face_component": {
+          "id": 33,
+          "bbox": [
+            140,
+            177,
+            317,
+            311
+          ],
+          "area": 9686,
+          "centroid": [
+            223.99,
+            254.05
+          ],
+          "aspect": 1.321
+        },
+        "white_streak_candidates": [
+          {
+            "id": 15,
+            "bbox": [
+              105,
+              46,
+              218,
+              339
+            ],
+            "area": 5319,
+            "centroid": [
+              133.68,
+              168.03
+            ],
+            "aspect": 0.386
+          },
+          {
+            "id": 16,
+            "bbox": [
+              175,
+              48,
+              237,
+              218
+            ],
+            "area": 4129,
+            "centroid": [
+              198.0,
+              131.09
+            ],
+            "aspect": 0.365
+          },
+          {
+            "id": 150,
+            "bbox": [
+              207,
+              351,
+              266,
+              422
+            ],
+            "area": 1760,
+            "centroid": [
+              238.89,
+              388.98
+            ],
+            "aspect": 0.831
+          },
+          {
+            "id": 146,
+            "bbox": [
+              267,
+              338,
+              287,
+              422
+            ],
+            "area": 1341,
+            "centroid": [
+              276.78,
+              382.79
+            ],
+            "aspect": 0.238
+          },
+          {
+            "id": 148,
+            "bbox": [
+              168,
+              343,
+              198,
+              422
+            ],
+            "area": 978,
+            "centroid": [
+              181.92,
+              384.75
+            ],
+            "aspect": 0.38
+          },
+          {
+            "id": 152,
+            "bbox": [
+              197,
+              354,
+              220,
+              416
+            ],
+            "area": 868,
+            "centroid": [
+              207.22,
+              382.34
+            ],
+            "aspect": 0.371
+          },
+          {
+            "id": 161,
+            "bbox": [
+              237,
+              376,
+              265,
+              422
+            ],
+            "area": 543,
+            "centroid": [
+              253.31,
+              405.89
+            ],
+            "aspect": 0.609
+          },
+          {
+            "id": 168,
+            "bbox": [
+              189,
+              382,
+              204,
+              422
+            ],
+            "area": 307,
+            "centroid": [
+              194.87,
+              407.76
+            ],
+            "aspect": 0.375
+          }
+        ]
+      }
+    }
+  },
+  "comparison_sheet": {
+    "sheet": "08_contact_sheets/reference_comparison.png",
+    "idle_scaled": [
+      399,
+      900
+    ],
+    "shared_scaled": [
+      438,
+      900
+    ]
+  },
+  "note": "public/og-cover.webp is byte-identical to src/assets/kai/kai-guide.webp (SHA-256 20f2ae34...). No separate attachment file exists in the workspace; the public OG cover is the only project asset that represents the previously shared approved illustration. It is a pointing/guide pose, not a neutral front view."
+}
