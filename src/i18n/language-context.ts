@@ -4,6 +4,7 @@ import type { Locale } from '../types/content'
 
 export interface LanguageContextValue {
   locale: Locale
+  setLocale: (locale: Locale) => void
   t: Dictionary
 }
 

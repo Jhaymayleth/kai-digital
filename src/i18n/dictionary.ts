@@ -9,6 +9,8 @@ export interface Dictionary {
     projects: string
     portfolio: string
     language: string
+    themeToLight: string
+    themeToDark: string
     skip: string
   }
   hero: {
@@ -42,6 +44,7 @@ export interface Dictionary {
     continue: string
     audioError: string
     unsupportedVoice: string
+    unavailableInEnglish: string
   }
   footer: {
     note: string
@@ -59,6 +62,8 @@ const es: Dictionary = {
     projects: 'Proyectos',
     portfolio: 'Portafolio',
     language: 'Idioma',
+    themeToLight: 'Cambiar a tema claro',
+    themeToDark: 'Cambiar a tema oscuro',
     skip: 'Saltar al contenido',
   },
   hero: {
@@ -94,6 +99,8 @@ const es: Dictionary = {
     continue: 'Continuar recorrido',
     audioError: 'No se pudo reproducir el audio de esta escena.',
     unsupportedVoice: 'Este navegador no permite reproducir audio.',
+    unavailableInEnglish:
+      'Lamentablemente, el asistente aún no está disponible en inglés.',
   },
   footer: {
     note: 'Una extensión del portafolio de José Mauricio Rangel Núñez.',
@@ -111,6 +118,8 @@ const en: Dictionary = {
     projects: 'Projects',
     portfolio: 'Portfolio',
     language: 'Language',
+    themeToLight: 'Switch to light theme',
+    themeToDark: 'Switch to dark theme',
     skip: 'Skip to content',
   },
   hero: {
@@ -146,6 +155,8 @@ const en: Dictionary = {
     continue: 'Continue walkthrough',
     audioError: 'This scene audio could not be played.',
     unsupportedVoice: 'This browser cannot play audio.',
+    unavailableInEnglish:
+      'Unfortunately, the assistant is not available in English yet.',
   },
   footer: {
     note: 'An extension of José Mauricio Rangel Núñez’s portfolio.',

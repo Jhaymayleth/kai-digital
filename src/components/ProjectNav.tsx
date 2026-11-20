@@ -1,5 +1,7 @@
 import { projects } from '../data/projects'
 import { useLanguage } from '../i18n/useLanguage'
+import { LanguageToggle } from './LanguageToggle'
+import { ThemeToggle } from './ThemeToggle'
 
 interface ProjectNavProps {
   activeId: string | null
@@ -41,6 +43,8 @@ export function ProjectNav({ activeId }: ProjectNavProps) {
         </nav>
 
         <div className="site-header__actions">
+          <LanguageToggle />
+          <ThemeToggle />
           <a
             className="portfolio-link"
             href="https://jhaymayleth.github.io/#proyectos"

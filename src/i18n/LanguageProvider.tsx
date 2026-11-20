@@ -1,10 +1,22 @@
-import { useEffect, useMemo, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { dictionaries } from './dictionary'
 import { LanguageContext } from './language-context'
 import type { Locale } from '../types/content'
 
+const STORAGE_KEY = 'portfolio:locale'
+
+function getInitialLocale(): Locale {
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY)
+    if (stored === 'es' || stored === 'en') return stored
+    return window.navigator.language.toLowerCase().startsWith('en') ? 'en' : 'es'
+  } catch {
+    return 'es'
+  }
+}
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const locale: Locale = 'es'
+  const [locale, setLocaleState] = useState<Locale>(getInitialLocale)
   const t = dictionaries[locale]
 
   useEffect(() => {
@@ -13,11 +25,18 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute('content', t.meta.description)
+    try {
+      window.localStorage.setItem(STORAGE_KEY, locale)
+    } catch {
+      // El idioma sigue funcionando en memoria sin almacenamiento persistente.
+    }
   }, [locale, t])
 
+  const setLocale = useCallback((next: Locale) => setLocaleState(next), [])
+
   const value = useMemo(
-    () => ({ locale, t }),
-    [t],
+    () => ({ locale, setLocale, t }),
+    [locale, setLocale, t],
   )
 
   return (

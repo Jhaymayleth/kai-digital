@@ -1,6 +1,7 @@
 import { KaiGuide } from './components/KaiGuide'
 import { ProjectChapter } from './components/ProjectChapter'
 import { ProjectNav } from './components/ProjectNav'
+import { ThemeProvider } from './theme/ThemeProvider'
 import { projects } from './data/projects'
 import { LanguageProvider } from './i18n/LanguageProvider'
 import { useLanguage } from './i18n/useLanguage'
@@ -125,6 +126,7 @@ function Experience() {
       </footer>
 
       <KaiGuide
+        key={locale}
         activeProject={activeProject}
         activeSection={activeSection}
         onStart={refreshActiveSection}
@@ -135,8 +137,10 @@ function Experience() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <Experience />
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <Experience />
+      </LanguageProvider>
+    </ThemeProvider>
   )
 }
